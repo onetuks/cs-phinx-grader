@@ -1,0 +1,6 @@
+exclude_dirs:
+  - tests
+  - migrations
+
+skips:
+  - B101 # assert 사용 경고 무시
