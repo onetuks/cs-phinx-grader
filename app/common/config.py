@@ -10,8 +10,6 @@ class Config:
 
   logging.basicConfig(level=logging.INFO)
 
-  MODEL_ID = 'MLP-KTLim/llama-3-Korean-Bllossom-8B'
-
 @dataclass
 class LocalConfig(Config):
   PROJ_RELOAD: bool = True

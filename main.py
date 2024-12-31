@@ -1,16 +1,29 @@
+from contextlib import asynccontextmanager
+from dataclasses import asdict
+from typing import AsyncContextManager
+
 import uvicorn
 from fastapi import FastAPI
 
 from app.common.config import conf
 from app.routes import index
+from app.service.service import DescriptiveAnswerGrader
 
+
+@asynccontextmanager
+async def lifespan(instance: FastAPI) -> AsyncContextManager:
+  grader_service = DescriptiveAnswerGrader()
+  grader_service.initialize()
+  instance.state.grader_service = grader_service
+  yield
+  del instance.state.grader_service
 
 def init_app():
-  instance = FastAPI()
+  instance = FastAPI(lifespan=lifespan)
 
   # 환경 정의
-  # config = conf()
-  # conf_dict = asdict(config)
+  config = conf()
+  conf_dict = asdict(config)
 
   # 미들웨어 정의
 
