@@ -1,66 +1,85 @@
 import pytest
 
-from app.service.service import DescriptiveAnswerGrader
+from app.schemas.grade_result import GradeResult
+from app.service.service import GradeService
 
 
-@pytest.fixture(scope="session")
-def grader_service():
-  return DescriptiveAnswerGrader()
+@pytest.mark.parametrize(
+    "user_answer,expected_answer",
+    [
+        (
+            "TCP는 연결지향 프로토콜이다.",
+            "TCP는 연결 지향적이며 신뢰성 있는 데이터 전송을 보장한다. UDP는 비연결 지향적이고 빠르지만 신뢰성이 낮다.",
+        ),
+        (
+            "UDP는 신속하지만 전송을 보장하지 않는다.",
+            "UDP는 TCP보다 빠르지만 신뢰성 있는 전송을 보장하지 않는다. TCP는 데이터 손실 없이 전송을 보장한다.",
+        ),
+        (
+            "인덱스는 조회 성능에 몰빵한 놈이다.",
+            "인덱스는 데이터를 빠르게 검색하기 위해 사용하는 자료구조이며, 조회 성능을 향상시키지만 저장 공간을 더 사용한다.",
+        ),
+    ],
+)
+def test_grade(user_answer, expected_answer, get_desirable_answers):
+    # When
+    result = GradeService().grade(user_answer, get_desirable_answers)
+
+    # Then
+    assert isinstance(result, GradeResult)
+    assert result.comment == expected_answer
 
 
-def test_encode_returns_tensor(grader_service):
-  # Given
-  question = "DB 인덱스에 대해서 설명해주세요."
-  answer = "DB 인덱스는 읽기 성능을 포기하고, 그외에 삽입/갱신/삭제 기능에 특화한 기술이야."
-
-  # When
-  result = grader_service.evaluate_answer(question, answer)
-
-  # Then
-  assert isinstance(result, str), "평가 결과는 문자열이어야 합니다."
-
-
-# @pytest.mark.parametrize(
-#     "question,answer,expected",
-#     [
-#       ("DB 인덱스에 대해서 설명해주세요.",
-#        "DB 인덱스는 읽기 성능을 포기하고, 그외에 삽입/갱신/삭제 기능에 특화한 기술이야.",
-#        "정답"),
-#       ("Python은 인터프리터 방식의 프로그래밍 언어가 맞니?",
-#        "파이썬은 C++이나 자바와는 다르게 컴파일러를 사용하지 않는 인터프리터 언어입니다.",
-#        "정답"),
-#       ("Java는 씨 언어와는 다르게 JVM이라는 가상환경에서 구동된다.",
-#        "나는 자연인이다.",
-#        "잘못"),
-#       ("MySQL의 기본 동시성 레벨은?",
-#        "MySQL의 기본 동시성 레벨은 Serializable 이다.",
-#        "잘못"),
-#       ("MySQL의 기본 동시성 레벨은?",
-#        "MySQL의 기본 동시성 레벨은 Repeatable Read이다.",
-#        "정답")
-#     ]
-# )
-# def test_calculate_similarity(grader_service, question, answer, expected):
-#   # When
-#   result = grader_service.evaluate_answer(question, answer)
-#
-#   # Then
-#   assert expected in result, "주어진 문제에 대한 올바른 답변이 아닙니다."
-
-def test_empty_question(grader_service):
-  # Given
-  question = ""
-  answer = "냉장고를 부탁해"
-
-  # When & Then
-  with pytest.raises(ValueError, match="Blank question"):
-    grader_service.evaluate_answer(question, answer)
-
-def test_empty_answer(grader_service):
-  # Given
-  question = "DB 동시성 레벨에 대해서 말해주세요."
-  answer = "    "
-
-  # When & Then
-  with pytest.raises(ValueError, match="Blank answer"):
-    grader_service.evaluate_answer(question, answer)
+@pytest.fixture
+def get_desirable_answers():
+    return [
+        "HashMap은 동기화를 지원하지 않으며 null 키와 값을 허용한다. Hashtable은 동기화를 지원하며 null 키를 허용하지 않는다.",
+        "HashMap은 멀티스레드 환경에서 안전하지 않지만, Hashtable은 동기화를 제공하여 스레드 안전하다.",
+        "@Transactional은 메소드나 클래스 단위에서 트랜잭션을 시작하고, 정상 완료 시 commit, 예외 발생 시 rollback을 수행한다.",
+        "@Transactional은 데이터 일관성을 유지하기 위해 트랜잭션을 관리하며, 예외 발생 시 자동으로 롤백한다.",
+        "TCP는 연결 지향적이며 신뢰성 있는 데이터 전송을 보장한다. UDP는 비연결 지향적이고 빠르지만 신뢰성이 낮다.",
+        "UDP는 TCP보다 빠르지만 신뢰성 있는 전송을 보장하지 않는다. TCP는 데이터 손실 없이 전송을 보장한다.",
+        "인덱스는 데이터를 빠르게 검색하기 위해 사용하는 자료구조이며, 조회 성능을 향상시키지만 저장 공간을 더 사용한다.",
+        "데이터 검색 속도를 높이는 자료구조로, 테이블의 일부 열에 대해 생성된다.",
+        "가비지 컬렉션은 더 이상 참조되지 않는 객체를 메모리에서 제거하여 메모리 누수를 방지한다.",
+        "사용하지 않는 객체를 자동으로 제거하여 메모리를 효율적으로 관리한다.",
+        "스택은 LIFO 구조를 가지며, 주로 함수 호출과 되돌리기에 사용된다.",
+        "큐는 FIFO 구조로, 순차적인 데이터 처리에 적합하다.",
+        "프로세스는 운영체제에서 독립적으로 실행되는 프로그램의 인스턴스다.",
+        "스레드는 같은 프로세스 내에서 실행되는 경량 실행 단위다.",
+        "HTTP는 상태를 저장하지 않는 프로토콜로, 각 요청이 독립적으로 처리된다.",
+        "HTTPS는 SSL/TLS를 사용하여 HTTP 통신을 암호화한다.",
+        "OSI 7계층은 네트워크 통신을 계층별로 나눈 모델이다.",
+        "TCP/IP 모델은 네트워크 계층을 4계층 구조로 표현한다.",
+        "정규화는 데이터 중복을 최소화하고 무결성을 유지하기 위해 테이블을 분해하는 과정이다.",
+        "비정규화는 성능 향상을 위해 데이터 중복을 허용하는 설계 방식이다.",
+        "Primary Key는 각 행을 고유하게 식별하는 컬럼이다.",
+        "Foreign Key는 다른 테이블의 Primary Key를 참조하는 제약 조건이다.",
+        "Spring Bean은 Spring IoC 컨테이너에서 관리되는 객체를 의미한다.",
+        "Bean Scope는 빈의 생성 및 공유 범위를 지정한다.",
+        "JPA는 객체와 데이터베이스 간의 매핑을 자동화하는 ORM 기술이다.",
+        "Hibernate는 JPA의 구현체 중 하나로, 엔티티 매핑과 SQL 생성을 지원한다.",
+        "배열은 고정된 크기의 연속된 메모리 공간을 사용하는 자료구조다.",
+        "리스트는 동적으로 크기를 변경할 수 있는 선형 자료구조다.",
+        "HashSet은 중복을 허용하지 않는 집합 자료구조다.",
+        "TreeSet은 정렬된 상태를 유지하는 집합 자료구조다.",
+        "DFS는 깊이 우선 탐색으로, 한 경로를 끝까지 탐색한 후 다른 경로를 탐색한다.",
+        "BFS는 너비 우선 탐색으로, 가까운 노드부터 차례로 탐색한다.",
+        "REST API는 자원을 HTTP 메서드로 표현하는 아키텍처 스타일이다.",
+        "SOAP은 XML 기반 메시징 프로토콜로, 강한 형식과 표준을 따른다.",
+        "JWT는 JSON 형식으로 인증 정보를 안전하게 전달하는 토큰이다.",
+        "세션은 서버에 사용자 상태를 저장하여 인증을 유지하는 방식이다.",
+        "쿠키는 클라이언트에 저장되는 작은 데이터 조각이다.",
+        "로딩 밸런싱은 여러 서버에 요청을 분산하여 성능과 가용성을 높인다.",
+        "CDN은 전 세계에 분산된 서버를 통해 콘텐츠를 빠르게 제공한다.",
+        "컴파일 언어는 실행 전에 코드를 기계어로 변환한다.",
+        "인터프리터 언어는 실행 시 코드를 한 줄씩 해석한다.",
+        "동기 처리 방식은 요청이 끝날 때까지 다음 작업을 수행하지 않는다.",
+        "비동기 처리 방식은 요청이 끝나기를 기다리지 않고 다음 작업을 수행한다.",
+        "Java에서 final 키워드는 변수, 메서드, 클래스의 변경을 제한한다.",
+        "static 키워드는 클래스 레벨에서 공유되는 멤버를 정의한다.",
+        "equals 메서드는 객체의 값 비교를, == 연산자는 참조 비교를 수행한다.",
+        "hashCode 메서드는 객체를 해시 기반 자료구조에서 효율적으로 관리하기 위한 값이다.",
+        "try-with-resources 구문은 자원을 자동으로 해제해준다.",
+        "람다 표현식은 함수형 인터페이스의 구현을 간결하게 표현한다.",
+    ]

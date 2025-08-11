@@ -1,66 +1,35 @@
-import logging
-from datetime import datetime
+from typing import List
 
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from sentence_transformers import SentenceTransformer
+from sentence_transformers.util import pytorch_cos_sim
 
-from app.common.consts import MODEL_NAME, SYSTEM_ROLE_CONTENT, FORMAT_CONTENT, \
-  MAX_NEW_TOKENS, INSTRUCTION_CONTENT
+from app.schemas.grade_result import GradeResult
 
 
-class DescriptiveAnswerGrader:
-  def __init__(self):
-    self.model = None
-    self.tokenizer = None
-    self.terminators = None
+class GradeService:
+    def __init__(self):
+        self.model = SentenceTransformer("distiluse-base-multilingual-cased-v1")
+        self.top_k = 5
 
-  def initialize(self, model_id: str = MODEL_NAME):
-    self.tokenizer = AutoTokenizer.from_pretrained(model_id, use_fast=True)
-    self.model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        torch_dtype=torch.bfloat16,
-        device_map="auto",
-    )
-    self.terminators = [
-      self.tokenizer.convert_tokens_to_ids("<|end_of_text|>"),
-      self.tokenizer.convert_tokens_to_ids("<|eot_id|>")
-    ]
+    def grade(self, user_answer: str, desirable_answers: List[str]) -> GradeResult:
+        if not desirable_answers:
+            return GradeResult(score=0, comment="no desirable answers provided")
 
-  def generate_evaluation(self, question: str, answer: str) -> str:
-    logging.info(f"evaluate_answer start: {datetime.now()}")
+        corpus_embeddings = self.model.encode(desirable_answers, convert_to_tensor=True)
+        query_embeddings = self.model.encode([user_answer], convert_to_tensor=True)
 
-    if not question.strip():
-      raise ValueError("Blank question")
-    if not answer.strip():
-      raise ValueError("Blank answer")
+        cos_scores = pytorch_cos_sim(query_embeddings, corpus_embeddings)
+        cos_scores = cos_scores.squeeze(0)
 
-    messages = [
-      {"role": "system", "content": SYSTEM_ROLE_CONTENT},
-      {"role": "user", "content": FORMAT_CONTENT},
-      {"role": "user", "content": INSTRUCTION_CONTENT},
-      {"role": "user", "content": f"주어진 문제: {question}"},
-      {"role": "user", "content": f"제시된 답안: {answer}"}
-    ]
+        top_k = min(self.top_k, len(desirable_answers))
+        values, indices = torch.topk(cos_scores, k=top_k)
 
-    input_ids = (self.tokenizer.apply_chat_template(
-        messages,
-        add_generation_prompt=True,
-        return_tensors="pt",
-    )).to(self.model.device)
+        best_score = float(values[0].item())
+        best_index = int(indices[0].item())
+        top_matches = [(desirable_answers[int(i.item())], float(v.item())) for v, i in zip(values, indices)]
 
-    outputs = self.model.generate(
-        input_ids,
-        max_new_tokens=MAX_NEW_TOKENS,
-        eos_token_id=self.terminators,
-        do_sample=True,
-        temperature=0.2,
-        top_p=0.8
-    )
-
-    logging.info(f"evaluate_answer end: {datetime.now()}")
-
-    return self.tokenizer.decode(outputs[0][input_ids.shape[-1]:])
-
-  def evaluate_answer(self, question: str, answer: str) -> str:
-    evaluation = self.generate_evaluation(question, answer).replace("<|eot_id|>", "")
-    return evaluation
+        return GradeResult(
+            score=int(best_score * 100),
+            comment=desirable_answers[best_index],
+        )
