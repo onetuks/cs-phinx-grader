@@ -41,4 +41,4 @@ jobs:
       - name: Run Tests
         if: steps.changes.outputs.app == 'true'
         run: |
-          pytest src/tests/ --cov=app/ --cov-report=term-missing --cov-report=html --cov-report=xml
+          pytest src/tests/ --cov=src/app/ --cov-report=term-missing --cov-report=html --cov-report=xml

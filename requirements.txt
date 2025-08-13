@@ -4,7 +4,6 @@ starlette~=0.47.2
 pydantic~=2.12.0a1
 
 pytest~=8.4.1
-pytest-cov~=6.2.1
 black~=25.1.0
 
 torch~=2.8.0
