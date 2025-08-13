@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.api import router
-from app.common.config import conf
+from app.core.config import conf
 
 
 def init_app():
