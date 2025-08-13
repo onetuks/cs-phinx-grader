@@ -5,7 +5,7 @@ on:
       - opened
       - synchronized
       - reopened
-    branches-ignore:
+    branches:
       - main
 
 permissions: read-all
@@ -25,7 +25,7 @@ jobs:
       with:
         filters: |
           app:
-            - '**/app/**'
+            - '**/src/**'
 
     - name: Set up Python
       if: steps.changes.outputs.app == 'true'

@@ -4,7 +4,7 @@ import torch
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import pytorch_cos_sim
 
-from app.schemas.grade_result import GradeResult
+from src.app.schemas.grade_result import GradeResult
 
 
 class GradeService:

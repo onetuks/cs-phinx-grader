@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from starlette.responses import Response
 
-from app.schemas.grade_request import GradeRequest
-from app.schemas.grade_response import GradeResponse
-from app.schemas.grade_result import GradeResult
-from app.service.service import GradeService
+from src.app.schemas.grade_request import GradeRequest
+from src.app.schemas.grade_response import GradeResponse
+from src.app.schemas.grade_result import GradeResult
+from src.app.service.service import GradeService
 
 router = APIRouter()
 

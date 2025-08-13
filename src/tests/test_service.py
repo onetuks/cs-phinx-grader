@@ -1,7 +1,7 @@
 import pytest
 
-from app.schemas.grade_result import GradeResult
-from app.service.service import GradeService
+from src.app.schemas.grade_result import GradeResult
+from src.app.service.service import GradeService
 
 
 @pytest.mark.parametrize(
