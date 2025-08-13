@@ -1,5 +1,5 @@
 # 🦁 CS 물어보는 스핑크스 채점기 🔮
-![logo.png](images/logo.png)
+![logo.png](.images/logo.png)
 
 ## 🎯 개발 목표
 - 서술형 문제 채점
@@ -11,7 +11,7 @@
   - Origin Server(Spring Boot)와 분리하여 MSA 형태 구동
 
 ## 🧬 프로젝트 구조
-![architecture.png](images/architecture.png)
+![architecture.png](.images/architecture.png)
 
 ## ⚖️ SBERT 모델 비교
 #### 결론
@@ -32,7 +32,7 @@
   - 한국어 성능은 한국어 특화 모델보다 낮을 수 있음
 - 테스트 결과
 
-![paraphrase_model.png](images/paraphrase_model.png)
+![paraphrase_model.png](.images/paraphrase_model.png)
 
 ### 2️⃣ snunlp/KR-SBERT-Medium-klueNLItriplet_PARpair-klueSTS
 - 한국어 중형 SBERT
@@ -45,7 +45,7 @@
   - 모델 크기 중간
 - 테스트 결과
 
-![kr_sbert_medium_model.png](images/kr_sbert_medium_model.png)
+![kr_sbert_medium_model.png](.images/kr_sbert_medium_model.png)
 
 ### 3️⃣ distiluse-base-multilingual-cased-v1
 - 다국어 SBERT 모델 (cased version)
@@ -56,7 +56,7 @@
   - 한국어 특화 데이터셋 기반이 아님
 - 테스트 결과
 
-![distiluse_model.png](images/distiluse_model.png)
+![distiluse_model.png](.images/distiluse_model.png)
 
 ### 4️⃣ snunlp/KR-SBERT-V40K-klueNLI-augSTS
 - 한국어 특화 SBERT 모델
@@ -69,5 +69,5 @@
   - 메모리 사용량 있음
 - 테스트 결과
 
-![kr_sbert_v40k_model_1.png](images/kr_sbert_v40k_model_1.png)
-![kr_sbert_v40k_model_2.png](images/kr_sbert_v40k_model_2.png)
+![kr_sbert_v40k_model_1.png](.images/kr_sbert_v40k_model_1.png)
+![kr_sbert_v40k_model_2.png](.images/kr_sbert_v40k_model_2.png)
