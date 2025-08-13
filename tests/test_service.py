@@ -23,6 +23,8 @@ from app.service.service import GradeService
 )
 def test_grade(user_answer, expected_answer, get_desirable_answers):
     # When
+    print("user_answer: ", user_answer)
+    print("expected_answer: ", expected_answer)
     result = GradeService().grade(user_answer, get_desirable_answers)
 
     # Then
