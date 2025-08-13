@@ -19,7 +19,7 @@ async def health():
 @router.put(
     "/api/grader",
     response_model=GradeResponse,
-    description="제출답변과 모범답안목록을 받아 채점점수, 근사해, 훈수를 반환",
+    description="제출답변과 모범답안목록을 받아 채점점수, 근사한 모범답안을 반환",
 )
 async def grade_user_answer(grade_request: GradeRequest):
     """
@@ -29,7 +29,7 @@ async def grade_user_answer(grade_request: GradeRequest):
 
     return GradeResponse(
         user_answer=grade_request.user_answer,
-        best_answer=result.comment,
-        user_score=result.score,
-        evaluation=result.comment,
+        desirable_answers=grade_request.desirable_answers,
+        best_score=result.best_score,
+        best_answer=result.best_answer,
     )

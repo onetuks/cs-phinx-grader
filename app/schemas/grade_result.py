@@ -2,5 +2,5 @@ from pydantic import BaseModel, Field
 
 
 class GradeResult(BaseModel):
-    score: int = Field(..., ge=0, le=100, description="채점 점수")
-    comment: str = Field(..., description="채점 코멘트")
+    best_score: int = Field(..., ge=0, le=100, description="채점점수")
+    best_answer: str = Field(..., description="근사한 모범답안")

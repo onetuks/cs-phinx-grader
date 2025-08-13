@@ -9,7 +9,7 @@ from app.schemas.grade_result import GradeResult
 
 class GradeService:
     def __init__(self):
-        self.model = SentenceTransformer("distiluse-base-multilingual-cased-v1")
+        self.model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
         self.top_k = 5
 
     def grade(self, user_answer: str, desirable_answers: List[str]) -> GradeResult:
@@ -27,9 +27,8 @@ class GradeService:
 
         best_score = float(values[0].item())
         best_index = int(indices[0].item())
-        top_matches = [(desirable_answers[int(i.item())], float(v.item())) for v, i in zip(values, indices)]
 
         return GradeResult(
-            score=int(best_score * 100),
-            comment=desirable_answers[best_index],
+            best_score=int(best_score * 100),
+            best_answer=desirable_answers[best_index],
         )
