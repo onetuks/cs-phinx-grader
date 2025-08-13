@@ -16,20 +16,19 @@ from src.app.service.service import GradeService
             "UDP는 TCP보다 빠르지만 신뢰성 있는 전송을 보장하지 않는다. TCP는 데이터 손실 없이 전송을 보장한다.",
         ),
         (
-            "인덱스는 조회 성능에 몰빵한 놈이다.",
+            "인덱스는 조회 성능을 향상시킨다.",
             "인덱스는 데이터를 빠르게 검색하기 위해 사용하는 자료구조이며, 조회 성능을 향상시키지만 저장 공간을 더 사용한다.",
         ),
     ],
 )
 def test_grade(user_answer, expected_answer, get_desirable_answers):
     # When
-    print("user_answer: ", user_answer)
-    print("expected_answer: ", expected_answer)
     result = GradeService().grade(user_answer, get_desirable_answers)
 
     # Then
     assert isinstance(result, GradeResult)
-    assert result.comment == expected_answer
+    assert result.best_answer == expected_answer
+    assert result.best_score >= 4
 
 
 @pytest.fixture

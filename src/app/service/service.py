@@ -8,13 +8,18 @@ from src.app.schemas.grade_result import GradeResult
 
 
 class GradeService:
+    _model = None
+
     def __init__(self):
-        self.model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+        if GradeService._model is None:
+            GradeService._model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+        self.model = GradeService._model
         self.top_k = 5
+        self.INVALID_SCORE = -1
 
     def grade(self, user_answer: str, desirable_answers: List[str]) -> GradeResult:
         if not desirable_answers:
-            return GradeResult(score=0, comment="no desirable answers provided")
+            return GradeResult(best_score=self.INVALID_SCORE, best_answer="no desirable answers provided")
 
         corpus_embeddings = self.model.encode(desirable_answers, convert_to_tensor=True)
         query_embeddings = self.model.encode([user_answer], convert_to_tensor=True)
